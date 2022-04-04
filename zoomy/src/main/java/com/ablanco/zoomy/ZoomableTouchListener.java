@@ -3,6 +3,7 @@ package com.ablanco.zoomy;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -106,13 +107,14 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
 
     @Override
     public boolean onTouch(View v, MotionEvent ev) {
+        int action = ev.getAction() & MotionEvent.ACTION_MASK;
 
-        if (mAnimatingZoomEnding || ev.getPointerCount() > 2) return true;
+        if ((mAnimatingZoomEnding || (ev.getPointerCount() > 2 && action != MotionEvent.ACTION_CANCEL))) {
+            return true;
+        }
 
         mScaleGestureDetector.onTouchEvent(ev);
         mGestureDetector.onTouchEvent(ev);
-
-        int action = ev.getAction() & MotionEvent.ACTION_MASK;
 
         switch (action) {
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -184,6 +186,11 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
         } else mEndingZoomAction.run();
     }
 
+    private int getStatusBarHeight() {
+        Rect windowRect = new Rect();
+        mTargetContainer.getDecorView().getWindowVisibleDisplayFrame(windowRect);
+        return windowRect.top;
+    }
 
     private void startZoomingView(View view) {
         mZoomableView = new ImageView(mTarget.getContext());
@@ -191,7 +198,9 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
         mZoomableView.setImageBitmap(ViewUtils.getBitmapFromView(view));
 
         //show the view in the same coords
-        mTargetViewCords = ViewUtils.getViewAbsoluteCords(view);
+        int statusBarHeight = getStatusBarHeight();
+        Point viewCords = ViewUtils.getViewAbsoluteCords(view);
+        mTargetViewCords = new Point(viewCords.x, viewCords.y - statusBarHeight);
 
         mZoomableView.setX(mTargetViewCords.x);
         mZoomableView.setY(mTargetViewCords.y);
