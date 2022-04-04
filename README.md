@@ -1,5 +1,5 @@
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.imablanco/zoomy)
-
+ 
 # Zoomy
 Zoomy is an easy to use pinch-to-zoom Android library
 
