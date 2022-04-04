@@ -16,7 +16,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionName "1.0.1-beta02"
+        versionName "1.0.1-beta03"
     }
     buildTypes {
         release {
@@ -59,12 +59,10 @@ publishing {
     }
     publications {
         android.libraryVariants.all { variant ->
-            ////def filename = "${archivesBaseName}-${variant.baseName}-${android.defaultConfig.versionName}"
             if (variant.buildType.name == "debug") {
                 def filename = "${archivesBaseName}-${variant.baseName}"
                 println("Filename: $filename")
                 "${variant.name}"(MavenPublication) {
-                    //println(variant.name)
                     groupId 'com.ltman'
                     artifactId = "zoomy"
                     version = "${android.defaultConfig.versionName}"
@@ -72,7 +70,6 @@ publishing {
                     artifact file("$buildDir/outputs/aar/${filename}.aar")
 
                     pom.withXml {
-                        // for dependencies and exclusions
                         def dependenciesNode = asNode().appendNode('dependencies')
                         def configurationNames = ["implementation", "api", "runtimeOnly"]
                         configurationNames.each { confName ->
@@ -82,14 +79,6 @@ publishing {
                                 dependencyNode.appendNode('artifactId', it.name)
                                 dependencyNode.appendNode('version', it.version)
                                 println("dependency: ${it}")
-//                                if (it.excludeRules.size() > 0) {
-//                                    def exclusionsNode = dependencyNode.appendNode('exclusions')
-//                                    it.excludeRules.each { rule ->
-//                                        def exclusionNode = exclusionsNode.appendNode('exclusion')
-//                                        exclusionNode.appendNode('groupId', rule.group)
-//                                        exclusionNode.appendNode('artifactId', rule.module)
-//                                    }
-//                                }
                             }
                         }
                     }
