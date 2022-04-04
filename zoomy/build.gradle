@@ -16,7 +16,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionName "1.0.1-beta04"
+        versionName "1.0.1"
     }
     buildTypes {
         release {
