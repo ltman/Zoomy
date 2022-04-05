@@ -3,6 +3,7 @@ package com.ablanco.zoomy;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -186,13 +187,25 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
         } else mEndingZoomAction.run();
     }
 
+    private int getStatusBarHeight() {
+        Rect windowRect = new Rect();
+        mTargetContainer.getDecorView().getWindowVisibleDisplayFrame(windowRect);
+        return windowRect.top;
+    }
+
     private void startZoomingView(View view) {
         mZoomableView = new ImageView(mTarget.getContext());
         mZoomableView.setLayoutParams(new ViewGroup.LayoutParams(mTarget.getWidth(), mTarget.getHeight()));
         mZoomableView.setImageBitmap(ViewUtils.getBitmapFromView(view));
 
         //show the view in the same coords
-        mTargetViewCords = ViewUtils.getViewAbsoluteCords(view);
+        int statusBarHeight = getStatusBarHeight();
+        Point viewCords = ViewUtils.getViewAbsoluteCords(view);
+        int viewCordsY = viewCords.y;
+        if (mConfig.isImmersiveModeEnabled()) {
+            viewCordsY = viewCords.y - statusBarHeight;
+        }
+        mTargetViewCords = new Point(viewCords.x, viewCordsY);
 
         mZoomableView.setX(mTargetViewCords.x);
         mZoomableView.setY(mTargetViewCords.y);
