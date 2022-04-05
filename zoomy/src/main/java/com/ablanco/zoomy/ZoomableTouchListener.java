@@ -3,7 +3,6 @@ package com.ablanco.zoomy;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -70,6 +69,7 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
         public void run() {
             removeFromDecorView(mShadow);
             removeFromDecorView(mZoomableView);
+            mShadow.setOnTouchListener(null);
             mTarget.setVisibility(View.VISIBLE);
             mZoomableView = null;
             mCurrentMovementMidPoint = new PointF();
@@ -186,27 +186,20 @@ class ZoomableTouchListener implements View.OnTouchListener, ScaleGestureDetecto
         } else mEndingZoomAction.run();
     }
 
-    private int getStatusBarHeight() {
-        Rect windowRect = new Rect();
-        mTargetContainer.getDecorView().getWindowVisibleDisplayFrame(windowRect);
-        return windowRect.top;
-    }
-
     private void startZoomingView(View view) {
         mZoomableView = new ImageView(mTarget.getContext());
         mZoomableView.setLayoutParams(new ViewGroup.LayoutParams(mTarget.getWidth(), mTarget.getHeight()));
         mZoomableView.setImageBitmap(ViewUtils.getBitmapFromView(view));
 
         //show the view in the same coords
-        int statusBarHeight = getStatusBarHeight();
-        Point viewCords = ViewUtils.getViewAbsoluteCords(view);
-        mTargetViewCords = new Point(viewCords.x, viewCords.y - statusBarHeight);
+        mTargetViewCords = ViewUtils.getViewAbsoluteCords(view);
 
         mZoomableView.setX(mTargetViewCords.x);
         mZoomableView.setY(mTargetViewCords.y);
 
         if (mShadow == null) mShadow = new View(mTarget.getContext());
         mShadow.setBackgroundResource(0);
+        mShadow.setOnTouchListener((v, ev) -> true);
 
         addToDecorView(mShadow);
         addToDecorView(mZoomableView);

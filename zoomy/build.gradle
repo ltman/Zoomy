@@ -16,7 +16,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionName "1.0.2"
+        versionName "1.0.2-beta01"
     }
     buildTypes {
         release {
@@ -74,11 +74,13 @@ publishing {
                         def configurationNames = ["implementation", "api", "runtimeOnly"]
                         configurationNames.each { confName ->
                             configurations[confName].allDependencies.each {
-                                def dependencyNode = dependenciesNode.appendNode('dependency')
-                                dependencyNode.appendNode('groupId', it.group)
-                                dependencyNode.appendNode('artifactId', it.name)
-                                dependencyNode.appendNode('version', it.version)
-                                println("dependency: ${it}")
+                                if (!it.group?.isBlank() && !it.name?.isBlank() && !it.version?.isBlank()) {
+                                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                                    dependencyNode.appendNode('groupId', it.group)
+                                    dependencyNode.appendNode('artifactId', it.name)
+                                    dependencyNode.appendNode('version', it.version)
+                                    println("dependency: ${it}")
+                                }
                             }
                         }
                     }
